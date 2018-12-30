@@ -37,7 +37,7 @@ To overcome this, I wanted to make sure the destruct method gets called prior to
 
 a:2:{i:1;O:1:"B":0:{};i:2;o:1:"C":0:{};}
 
-This will unserialize an array, consisting of a 'B' object as its first item. For the second item, we will try to unserialize an object of class 'C' which isn't declared. That will throw an exception. As that call to unserialize has the @ mark before it, php will silence any php error the function raises. As the unserialize call already instantiated an instance of 'B' class, it has to call its destruct method and echo the content of $flag.
+This will unserialize an array, consisting of a 'B' object as its first item. For the second item, we will try to unserialize an object of class 'C' which isn't declared. That will throw an exception. As that call to unserialize has the @ mark before it, php will silence any php error the function raises. As the unserialize call already instantiated an instance of 'B' class, and there is not any reference to it, it has to call its destruct method and echo the content of $flag.
 
 ```
 gal@ubuntu:/var/www/html$ nc 35.242.207.13 1
